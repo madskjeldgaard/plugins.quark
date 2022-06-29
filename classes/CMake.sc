@@ -1,48 +1,113 @@
+/*
+//
+// Example:
+CMake
+.new(
+    path: "/home/mads/tmp/XPlayBuf",
+    pathToSuperColliderHeaders: "/usr/share/supercollider-headers/",
+    installLoation: "/home/mads/tmp"
+)
+.prepareAndBuild()
+
+*
+*/
 CMake{
-    classvar <>sc_path;
-    classvar <>install_location;
+    var <>sc_path;
+    var <>install_location;
+    var <>localPath;
 
-    // cmake -DSC_PATH=$SC_SRC -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$DEST ..
+    *new{|path, pathToSuperColliderHeaders, installLocation|
+        ^super.new
+        .localPath_(path)
+        .sc_path_(pathToSuperColliderHeaders)
+        .install_location_(installLocation ? Platform.userExtensionDir)
+    }
 
-    *prepare{|flags|
-        var buildflags = flags ? [
-            "-DCMAKE_BUILD_TYPE=RELEASE",
-            "-DCMAKE_INSTALL_PREFIX=%".format(install_location ? Platform.userExtensionDir)
-        ];
-        var cmd = ["cmake", buildflags, ".."];
+    // This will prepare, build and optionally install the plugins
+    prepareAndBuild{|config="Release", prepareFlags, buildFlags, install=true|
+        this.prepare(config: config, flags: prepareFlags, enterBuildDir: true);
+        this.build(config: config, install: install, flags: buildFlags, enterBuildDir: true);
+    }
 
-        if(sc_path.notNil, {
-            cmd = (cmd ++ ["-DSC_PATH=%".format(sc_path)]).join(" ");
+    prepare{|config="Release", flags, enterBuildDir=true|
+        if(this.checkForCMake(),{
+            var buildflags = flags ? [
+                "-DCMAKE_INSTALL_PREFIX=%".format(install_location ? Platform.userExtensionDir)
+            ];
+            var cmd;
+            buildflags = ["-DCMAKE_BUILD_TYPE=%".format(config)] ++ buildflags;
+
+            cmd = ["cmake"] ++ buildflags;
+
+            if(enterBuildDir, {
+                cmd = this.prEnterBuild(makeFolder: true) ++ cmd;
+            });
+
+            // Move to project dir
+            cmd = ["cd", localPath, ";"] ++ cmd;
+
+            if(sc_path.notNil, {
+                cmd = (cmd ++ ["-DSC_PATH=%".format(sc_path)] ++ [".."] ).join(" ");
+
+                this.prCall(cmd);
+            }, {
+                "%: sc_path is not set. Please set it to the location of the SuperCollider header files.".format(this.name).error
+            });
+        })
+    }
+
+    build{|config="Release", install=true, flags([]), enterBuildDir=true|
+        if(this.checkForCMake, {
+            var cmd = ["cmake", "--build", "."];
+
+            if(install, {
+                cmd = cmd ++ ["--target", "install"]
+            });
+
+            cmd = cmd ++ ["--config", config] ++ flags;
+
+            if(enterBuildDir, {
+                cmd = this.prEnterBuild(makeFolder: true) ++ cmd;
+            });
+
+            // Move to project dir
+            cmd = ["cd", localPath, ";"] ++ cmd;
+
+            cmd = cmd.join(" ");
+
             this.prCall(cmd);
+        })
+
+    }
+
+    prEnterBuild{|makeFolder=true|
+        var cmd = ["cd", "build", ";"];
+
+        if(makeFolder, {
+            // -p results in the command not failing if it already exists
+            cmd = ["mkdir", "-p", "build", ";"] ++ cmd;
+        });
+
+        ^cmd
+    }
+
+    checkForCMake{
+        var cmakeFind = "which cmake";
+        var result="";
+        Pipe.callSync(cmakeFind, { |res|
+            result = true;
         }, {
-            "%: sc_path is not set. Please set it to the location of the SuperCollider header files.".format(this.name).error
+            result = false;
         });
 
-        cmd.postln;
-
-    }
-
-    *build{|config="Release", install=true, flags|
-        // cmake --build . --config Release --target install
-        var cmd = ["cmake", "--build", "."];
-
-        if(install, {
-            cmd = cmd ++ ["--target", "install"]
+        if(result.not, {
+            "CMake is not installed".error;
         });
 
-        cmd = cmd ++ ["--config", config];
-
-        cmd = (cmd ++ ["-DSC_PATH=%".format(sc_path)]).join(" ");
-        this.prCall(cmd);
-
+        ^result
     }
 
-    // TODO
-    *checkForCMake{
-        ^true
-    }
-
-    *prCall{|cmd|
+    prCall{|cmd|
         var result = "";
 
         Pipe.callSync(cmd, { |res|
@@ -51,11 +116,9 @@ CMake{
             this.checkForCMake();
         });
 
-        ^result
+        ^result.postln
     }
 
 }
 
-PluginInstall{
-
-}
+// PluginInstall{ }
