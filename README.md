@@ -19,6 +19,8 @@ Plugins.scheaders_("~/supercollider".asAbsolutePath);
 Plugins.gui;
 ```
 
+See the helpfile for "Plugins" for more information on usage.
+
 ## Development
 
 This project is still a work in progress - but please, help out if you can. I am particularly grateful for pull requests that fixes things, but also issues. Thanks.
