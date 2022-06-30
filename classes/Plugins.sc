@@ -77,7 +77,7 @@ Plugins{
         // TODO: Cmake command
         // if(result, {
             cmake = CMake.new(
-                path: (this.pluginSupportDir +/+ key).quote(),
+                path: (this.pluginSupportDir +/+ key),
                 pathToSuperColliderHeaders: scheaders,
                 installLocation: Platform.userExtensionDir
             );
