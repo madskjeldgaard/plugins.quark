@@ -32,10 +32,10 @@ CMake{
     prepare{|config="Release", flags, enterBuildDir=true|
         if(this.checkForCMake(),{
             var buildflags = flags ? [
-                "-DCMAKE_INSTALL_PREFIX=%".format(install_location ? Platform.userExtensionDir)
+                "-DCMAKE_INSTALL_PREFIX=\"%\"".format(install_location ? Platform.userExtensionDir)
             ];
             var cmd;
-            buildflags = ["-DCMAKE_BUILD_TYPE=%".format(config)] ++ buildflags;
+            buildflags = ["-DCMAKE_BUILD_TYPE=\"%\"".format(config)] ++ buildflags;
 
             cmd = ["cmake"] ++ buildflags;
 
@@ -47,7 +47,7 @@ CMake{
             cmd = ["cd", localPath, ";"] ++ cmd;
 
             if(sc_path.notNil, {
-                cmd = (cmd ++ ["-DSC_PATH=%".format(sc_path)] ++ [".."] ).join(" ");
+                cmd = (cmd ++ ["-DSC_PATH=\"%\"".format(sc_path)] ++ [".."] ).join(" ");
 
                 this.prCall(cmd.postln);
             }, {
@@ -71,7 +71,7 @@ CMake{
             });
 
             // Move to project dir
-            cmd = ["cd", localPath, ";"] ++ cmd;
+            cmd = ["echo", "Current dir: $(pwd)", ";", "cd", localPath, ";"] ++ cmd;
 
             cmd = cmd.join(" ");
 
@@ -111,12 +111,12 @@ CMake{
         var result = "";
 
         Pipe.callSync(cmd, { |res|
-            result = res;
+            result = res.postln;
         }, {
             this.checkForCMake();
         });
 
-        ^result.postln
+        ^result
     }
 
 }

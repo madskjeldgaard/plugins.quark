@@ -19,9 +19,10 @@ Plugins{
     }
 
     *createSupportDirIfNecessary{
-        var path = PathName(Platform.userConfigDir) +/+ "pluginpackages";
+        var path = PathName(Platform.userAppSupportDir) +/+ "pluginpackages";
 
         if(path.isFolder.not, {
+            "%: Creating folder for plugin packages".format(this.name).postln;
             File.mkdir(path.fullPath)
         });
 
@@ -74,7 +75,7 @@ Plugins{
         var result = this.cloneGitDir(selected[\url], this.pluginSupportDir.replace(" ", "\\ "));
 
         // TODO: Cmake command
-        if(result, {
+        // if(result, {
             cmake = CMake.new(
                 path: this.pluginSupportDir.replace(" ", "\\ ") +/+ key,
                 pathToSuperColliderHeaders: scheaders.replace(" ", "\\ "),
@@ -82,7 +83,7 @@ Plugins{
             );
 
             cmake.prepareAndBuild();
-        })
+        // })
     }
 
     *cloneGitDir{arg url, targetDir;
@@ -90,25 +91,14 @@ Plugins{
         var cdcmd = ["cd", targetDir, ";"];
         var cmd = ["git", "clone", "--recurse-submodules", url];
 
-        if(PathName(targetDir).isFolder, {
-            // FIXME: Pull new changes instead
-            "Target directory already exists. Not cloning it.".warn;
-            result = true
-        }, {
-            cmd = (cdcmd ++ cmd).join(" ");
+        cmd = (cdcmd ++ cmd).join(" ");
 
-            Pipe.callSync(cmd.postln, { |res|
-                res.postln;
-                result = true;
-            }, {|res|
-                res.postln;
-                result = false;
-            });
-
-            result.not.if{
-                "%: Could not clone url".format(this.name).error;
-            };
-
+        Pipe.callSync(cmd.postln, { |res|
+            res.postln;
+            result = true;
+        }, {|res|
+            res.postln;
+            result = false;
         });
 
         ^result
