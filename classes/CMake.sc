@@ -18,9 +18,9 @@ CMake{
 
     *new{|path, pathToSuperColliderHeaders, installLocation|
         ^super.new
-        .localPath_(path)
-        .sc_path_(pathToSuperColliderHeaders)
-        .install_location_(installLocation ? Platform.userExtensionDir)
+        .localPath_(path.escapeChar(Char.space))
+        .sc_path_(pathToSuperColliderHeaders.escapeChar(Char.space))
+        .install_location_((installLocation ? Platform.userExtensionDir).escapeChar(Char.space))
     }
 
     // This will prepare, build and optionally install the plugins
@@ -49,7 +49,7 @@ CMake{
             if(sc_path.notNil, {
                 cmd = (cmd ++ ["-DSC_PATH=%".format(sc_path)] ++ [".."] ).join(" ");
 
-                this.prCall(cmd);
+                this.prCall(cmd.postln);
             }, {
                 "%: sc_path is not set. Please set it to the location of the SuperCollider header files.".format(this.name).error
             });
@@ -75,7 +75,7 @@ CMake{
 
             cmd = cmd.join(" ");
 
-            this.prCall(cmd);
+            this.prCall(cmd.postln);
         })
 
     }

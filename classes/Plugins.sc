@@ -1,17 +1,14 @@
-PluginPackages{
+Plugins{
     classvar <path;
     classvar <packageFiles;
     classvar <packageDescriptions;
     classvar <pluginSupportDir;
-
-    // *thisPackage{
-    //     ^Quarks.findClassPackage(this)
-    // }
+    classvar <>scheaders;
 
     *initClass{
         StartUp.add({
             packageDescriptions = IdentityDictionary.new;
-            path = Quarks.at("cmake.quark").localPath;
+            path = Quarks.at("plugins.quark").localPath;
             packageFiles = PathName(path +/+ "packages").files;
 
             // FIXME: this shouldn't be done at every class init
@@ -28,7 +25,8 @@ PluginPackages{
             File.mkdir(path.fullPath)
         });
 
-        pluginSupportDir = path.fullPath.replace(" ", "\\ ");
+        // pluginSupportDir = path.fullPath.replace(" ", "\\ ");
+        pluginSupportDir = path.fullPath;
 
     }
 
@@ -43,7 +41,20 @@ PluginPackages{
         var name = "Install plugin package";
         var win = Window.new(name);
         var layout;
-        var list = ListView.new(parent:win).items_(packageDescriptions.keys.asArray);
+        var descTitle = StaticText.new(win).string_("Title").font_(Font.default.bold_(true));
+        var desc = StaticText.new(win).string_("description");
+        var url = StaticText.new(win).string_("url");
+        var copyright = StaticText.new(win).string_("copyright");
+        var list = ListView.new(parent:win).items_(packageDescriptions.keys.asArray)
+            .selectionAction_({arg obj;
+            var index = obj.value;
+            var thisKey = packageDescriptions.keys.asArray[index];
+            var thisDesc = packageDescriptions[thisKey];
+            descTitle.string_(thisDesc[\name]);
+            desc.string_("Summary: " ++ thisDesc[\summary]);
+            url.string_("url: " ++ thisDesc[\url]);
+            copyright.string_("copyright: " ++ thisDesc[\copyright]);
+        });
 
         var installbutton = Button.new(win)
         .states_([["Install selected"]]).action_({
@@ -52,15 +63,26 @@ PluginPackages{
             this.installPlugin(key)
         });
 
-        layout = VLayout.new(*[installbutton, list]);
+        layout = VLayout.new(*[installbutton, list, descTitle, desc, url, copyright]);
         win.layout = layout;
         win.front;
     }
 
     *installPlugin{arg key;
+        var cmake;
         var selected = packageDescriptions.at(key);
-        this.cloneGitDir(selected[\url], this.pluginSupportDir);
+        var result = this.cloneGitDir(selected[\url], this.pluginSupportDir.replace(" ", "\\ "));
+
         // TODO: Cmake command
+        if(result, {
+            cmake = CMake.new(
+                path: this.pluginSupportDir.replace(" ", "\\ ") +/+ key,
+                pathToSuperColliderHeaders: scheaders.replace(" ", "\\ "),
+                installLocation: Platform.userExtensionDir.replace(" ", "\\ ")
+            );
+
+            cmake.prepareAndBuild();
+        })
     }
 
     *cloneGitDir{arg url, targetDir;
@@ -70,7 +92,8 @@ PluginPackages{
 
         if(PathName(targetDir).isFolder, {
             // FIXME: Pull new changes instead
-            "Target directory already exists. Not cloning it.".warn
+            "Target directory already exists. Not cloning it.".warn;
+            result = true
         }, {
             cmd = (cdcmd ++ cmd).join(" ");
 
@@ -87,5 +110,7 @@ PluginPackages{
             };
 
         });
+
+        ^result
     }
 }
