@@ -1,10 +1,9 @@
 Features:
-- Help files
 - Add section to package dict containing build flags and one for preparation flags.
 - Add section for pre build command, post build command, etc.
 - "Reinstall" - when package is already installed, pressing "install" on them will simply pull latest and reinstall them.
 
 Plugins to add:
+- vstplugin
 - Flucoma
 - mi-UGens
-- vstplugin

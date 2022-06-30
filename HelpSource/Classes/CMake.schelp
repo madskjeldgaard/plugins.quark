@@ -1,0 +1,82 @@
+TITLE::CMake
+SUMMARY::A SuperCollider interface for CMake
+CATEGORIES::Plugins
+RELATED::Classes/Plugins
+
+DESCRIPTION::
+This is a simple interface to deal with CMake - a build system generator. The
+primary usecase for this is to automate plugin compilation from within
+SuperCollider.
+
+CLASSMETHODS::
+METHOD::new
+ARGUMENT::path
+Path to folder with CMake project in it.
+
+ARGUMENT::pathToSuperColliderHeaders
+Path to development headers for SuperCollider. If you clone the supercollider
+repo somewhere on your system, this is the path you need to input here.
+
+ARGUMENT::installLocation
+If you use the installation command, this is where the project will be installed
+on your system. By default it is set to code::Platform.userExtensionDir::.
+
+INSTANCEMETHODS::
+METHOD::sc_path
+Get or set the path for the supercollider headers
+
+METHOD::install_location
+
+METHOD::localPath
+
+METHOD::prepareAndBuild
+This method will run the preparation command and the build command in sequence.
+It can also do the installation if told to.
+
+ARGUMENT::config
+What build configuration to use. Usually code::"Release":: or code::"Debug"::.
+
+ARGUMENT::prepareFlags
+Flags passed to the first cmake command (the one that prepares the build
+system). Must be an array.
+
+ARGUMENT::buildFlags
+Flags passed to the second cmake command (the one that builds and possibly
+installs the project on your system). Must be an array.
+
+ARGUMENT::install
+Boolean. If true it will install the project after compilation.
+
+METHOD::prepare
+ARGUMENT::config
+ARGUMENT::flags
+ARGUMENT::enterBuildDir
+
+METHOD::build
+ARGUMENT::config
+ARGUMENT::install
+ARGUMENT::flags
+ARGUMENT::enterBuildDir
+
+METHOD::prEnterBuild
+ARGUMENT::makeFolder
+
+METHOD::checkForCMake
+
+METHOD::prCall
+ARGUMENT::cmd
+
+EXAMPLES::
+
+CODE::
+(
+// Let's compile and install Gianluca's XPlayBuf project
+var cmake = CMake.new(
+    path: "/home/mads/tmp/XPlayBuf",
+    pathToSuperColliderHeaders: "~/supercollider".asAbsolutePath, // If you cloned supercollider to your user's home directory.
+    installLoation: "/home/mads/tmp"
+);
+
+// Run the cmake commands. Keep an eye on the post window.
+cmake.prepareAndBuild()
+::

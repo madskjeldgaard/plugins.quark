@@ -1,0 +1,53 @@
+TITLE::Plugins
+SUMMARY::A package manager for SuperCollider plugins
+CATEGORIES::Plugins
+RELATED::Classes/Plugins
+
+DESCRIPTION::
+This is a simple package manager for installing SuperCollider plugins inspired
+by Quarks.
+
+CLASSMETHODS::
+METHOD::gui
+Run the gui to install plugins.
+
+METHOD::path
+Path to this package's folder
+
+METHOD::packageFiles
+Get a list of all package description files
+
+METHOD::packageDescriptions
+A dictionary containing all the package descriptions
+
+METHOD::pluginSupportDir
+The folder on your system where the projects will be cloned to.
+
+METHOD::scheaders
+Get or set the path to your SuperCollider headers
+
+METHOD::initClass
+
+METHOD::createSupportDirIfNecessary
+
+METHOD::loadPackageDescriptions
+
+METHOD::installPlugin
+Install a plugin. The key corresponds to the file name of the package
+description without the .scd extension.
+ARGUMENT::key
+
+METHOD::cloneGitDir
+ARGUMENT::url
+ARGUMENT::targetDir
+
+EXAMPLES::
+
+CODE::
+// If you have cloned the SuperCollider repo to your user's home directory.
+// Otherwise set it to the correct path
+Plugins.scheaders_("~/supercollider".asAbsolutePath);
+
+// Open the gui to install packages.
+Plugins.gui;
+::
