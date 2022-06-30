@@ -23,11 +23,11 @@ Plugins{
 
         if(path.isFolder.not, {
             "%: Creating folder for plugin packages".format(this.name).postln;
-            File.mkdir(path.fullPath.quote())
+            File.mkdir(path.fullPath)
         });
 
         // pluginSupportDir = path.fullPath.replace(" ", "\\ ");
-        pluginSupportDir = path.fullPath.quote();
+        pluginSupportDir = path.fullPath;
 
     }
 
@@ -77,7 +77,7 @@ Plugins{
         // TODO: Cmake command
         // if(result, {
             cmake = CMake.new(
-                path: this.pluginSupportDir +/+ key,
+                path: (this.pluginSupportDir +/+ key).quote(),
                 pathToSuperColliderHeaders: scheaders,
                 installLocation: Platform.userExtensionDir
             );
@@ -88,7 +88,7 @@ Plugins{
 
     *cloneGitDir{arg url, targetDir;
         var result = "";
-        var cdcmd = ["cd", targetDir, ";"];
+        var cdcmd = ["cd", targetDir.quote(), ";"];
         var cmd = ["git", "clone", "--recurse-submodules", url];
 
         cmd = (cdcmd ++ cmd).join(" ");

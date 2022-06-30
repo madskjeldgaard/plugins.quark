@@ -19,7 +19,7 @@ CMake{
     *new{|path, pathToSuperColliderHeaders, installLocation|
         ^super
         .new
-        .localPath_(path)
+        .localPath_(path.quote())
         .sc_path_(pathToSuperColliderHeaders.quote())
         .install_location_(installLocation ? Platform.userExtensionDir)
     }
