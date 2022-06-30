@@ -7,6 +7,9 @@ DESCRIPTION::
 This is a simple package manager for installing SuperCollider plugins inspired
 by Quarks.
 
+This class will automatically download the supercollider repo to the
+code::Plugins.pluginSupportDir:: folder where all cloned repos are put.
+
 CLASSMETHODS::
 METHOD::gui
 Run the gui to install plugins.
@@ -44,10 +47,6 @@ ARGUMENT::targetDir
 EXAMPLES::
 
 CODE::
-// If you have cloned the SuperCollider repo to your user's home directory.
-// Otherwise set it to the correct path
-Plugins.scheaders_("~/supercollider".asAbsolutePath);
-
 // Open the gui to install packages.
 Plugins.gui;
 ::

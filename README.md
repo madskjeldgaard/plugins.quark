@@ -10,11 +10,8 @@ Quarks.install("https://github.com/madskjeldgaard/plugins.quark")
 ```
 
 ## Usage
-```supercollider
-// If you have cloned the SuperCollider repo to your user's home directory.
-// Otherwise set it to the correct path
-Plugins.scheaders_("~/supercollider".asAbsolutePath);
 
+```supercollider
 // Open the gui to install packages.
 Plugins.gui;
 ```

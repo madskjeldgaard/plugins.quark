@@ -26,6 +26,7 @@ Plugins{
 
         // pluginSupportDir = path.fullPath.replace(" ", "\\ ");
         pluginSupportDir = path.fullPath;
+        scheaders = scheaders ? (this.pluginSupportDir +/+ "supercollider");
 
     }
 
@@ -83,6 +84,11 @@ Plugins{
         var selected = packageDescriptions.at(key);
         var result = this.cloneGitDir(selected[\url], this.pluginSupportDir);
 
+        // Clone SuperCollider if necessary
+        if(PathName(this.pluginSupportDir +/+ "supercollider").isFolder.not, {
+            this.cloneGitDir("https://github.com/supercollider/supercollider", this.pluginSupportDir)
+        });
+
         this.loadPackageDescriptions();
 
         // TODO: Cmake command
@@ -93,7 +99,10 @@ Plugins{
                 installLocation: Platform.userExtensionDir
             );
 
-            cmake.prepareAndBuild();
+            cmake.prepareAndBuild(
+                prepareFlags:selected[\prepareFlags] ? [],
+                buildFlags:selected[\buildFlags] ? []
+            );
         // })
     }
 

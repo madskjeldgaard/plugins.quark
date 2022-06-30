@@ -32,7 +32,7 @@ CMake{
 
     prepare{|config="Release", flags, enterBuildDir=true|
         if(this.checkForCMake(),{
-            var buildflags = flags ? [
+            var buildflags = flags ++ [
                 "-DCMAKE_INSTALL_PREFIX=\"%\"".format(install_location ? Platform.userExtensionDir)
             ];
             var cmd;
