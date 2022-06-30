@@ -17,10 +17,11 @@ CMake{
     var <>localPath;
 
     *new{|path, pathToSuperColliderHeaders, installLocation|
-        ^super.new
-        .localPath_(path.escapeChar(Char.space))
-        .sc_path_(pathToSuperColliderHeaders.escapeChar(Char.space))
-        .install_location_((installLocation ? Platform.userExtensionDir).escapeChar(Char.space))
+        ^super
+        .new
+        .localPath_(path)
+        .sc_path_(pathToSuperColliderHeaders.quote())
+        .install_location_(installLocation ? Platform.userExtensionDir)
     }
 
     // This will prepare, build and optionally install the plugins
@@ -47,7 +48,7 @@ CMake{
             cmd = ["cd", localPath, ";"] ++ cmd;
 
             if(sc_path.notNil, {
-                cmd = (cmd ++ ["-DSC_PATH=\"%\"".format(sc_path)] ++ [".."] ).join(" ");
+                cmd = (cmd ++ ["-DSC_PATH=%".format(sc_path)] ++ [".."] ).join(" ");
 
                 this.prCall(cmd.postln);
             }, {
@@ -71,7 +72,7 @@ CMake{
             });
 
             // Move to project dir
-            cmd = ["echo", "Current dir: $(pwd)", ";", "cd", localPath, ";"] ++ cmd;
+            cmd = [ "cd", localPath, ";"] ++ cmd;
 
             cmd = cmd.join(" ");
 
@@ -82,13 +83,14 @@ CMake{
 
     prEnterBuild{|makeFolder=true|
         var cmd = ["cd", "build", ";"];
+        var debug = [ "echo", "Current dir: $(pwd)", ";" ];
 
         if(makeFolder, {
             // -p results in the command not failing if it already exists
             cmd = ["mkdir", "-p", "build", ";"] ++ cmd;
         });
 
-        ^cmd
+        ^debug ++ cmd
     }
 
     checkForCMake{

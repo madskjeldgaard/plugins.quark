@@ -23,11 +23,11 @@ Plugins{
 
         if(path.isFolder.not, {
             "%: Creating folder for plugin packages".format(this.name).postln;
-            File.mkdir(path.fullPath)
+            File.mkdir(path.fullPath.quote())
         });
 
         // pluginSupportDir = path.fullPath.replace(" ", "\\ ");
-        pluginSupportDir = path.fullPath;
+        pluginSupportDir = path.fullPath.quote();
 
     }
 
@@ -72,14 +72,14 @@ Plugins{
     *installPlugin{arg key;
         var cmake;
         var selected = packageDescriptions.at(key);
-        var result = this.cloneGitDir(selected[\url], this.pluginSupportDir.replace(" ", "\\ "));
+        var result = this.cloneGitDir(selected[\url], this.pluginSupportDir);
 
         // TODO: Cmake command
         // if(result, {
             cmake = CMake.new(
-                path: this.pluginSupportDir.replace(" ", "\\ ") +/+ key,
-                pathToSuperColliderHeaders: scheaders.replace(" ", "\\ "),
-                installLocation: Platform.userExtensionDir.replace(" ", "\\ ")
+                path: this.pluginSupportDir +/+ key,
+                pathToSuperColliderHeaders: scheaders,
+                installLocation: Platform.userExtensionDir
             );
 
             cmake.prepareAndBuild();

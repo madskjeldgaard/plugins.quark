@@ -1,9 +1,7 @@
 # Plugins.quark
 ![pluginquark.jpeg](pluginquark.jpeg) 
 
-
 This is a simple package management system for installing SuperCollider plugins. It automatically downloads, compiles and installs UGens on your system. It contains a directory of plugins and an easy to use GUI inspired by the Quark system.
-
 
 ## Installation
 
