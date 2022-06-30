@@ -1,4 +1,5 @@
 Plugins{
+    classvar <>includeDraftPackages=false;
     classvar <path;
     classvar <packageFiles;
     classvar <packageDescriptions;
@@ -9,11 +10,8 @@ Plugins{
         StartUp.add({
             packageDescriptions = IdentityDictionary.new;
             path = Quarks.at("plugins.quark").localPath;
-            packageFiles = PathName(path +/+ "packages").files;
 
-            // FIXME: this shouldn't be done at every class init
-            this.createSupportDirIfNecessary();
-            this.loadPackageDescriptions();
+            packageFiles = PathName(path +/+ "packages").files;
         });
 
     }
@@ -32,10 +30,17 @@ Plugins{
     }
 
     *loadPackageDescriptions{
+        if(includeDraftPackages, {
+            packageFiles = packageFiles ++ PathName(path +/+ "draft-packages").files;
+
+        });
+
+        // FIXME: this shouldn't be done at every class init
+        this.createSupportDirIfNecessary();
+
         packageFiles.do{ arg file;
             packageDescriptions.put(file.fileNameWithoutExtension, file.fullPath.load())
         }
-
     }
 
     *gui{
@@ -46,7 +51,11 @@ Plugins{
         var desc = StaticText.new(win).string_("description");
         var url = StaticText.new(win).string_("url");
         var copyright = StaticText.new(win).string_("copyright");
-        var list = ListView.new(parent:win).items_(packageDescriptions.keys.asArray)
+        var installbutton, list;
+
+        this.loadPackageDescriptions();
+
+        list = ListView.new(parent:win).items_(packageDescriptions.keys.asArray)
             .selectionAction_({arg obj;
             var index = obj.value;
             var thisKey = packageDescriptions.keys.asArray[index];
@@ -57,7 +66,7 @@ Plugins{
             copyright.string_("copyright: " ++ thisDesc[\copyright]);
         });
 
-        var installbutton = Button.new(win)
+        installbutton = Button.new(win)
         .states_([["Install selected"]]).action_({
             var val = list.selection[0];
             var key = packageDescriptions.keys.asArray[val];
@@ -73,6 +82,8 @@ Plugins{
         var cmake;
         var selected = packageDescriptions.at(key);
         var result = this.cloneGitDir(selected[\url], this.pluginSupportDir);
+
+        this.loadPackageDescriptions();
 
         // TODO: Cmake command
         // if(result, {
