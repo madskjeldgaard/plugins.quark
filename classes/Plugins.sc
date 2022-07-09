@@ -90,6 +90,7 @@ Plugins{
         });
 
         this.loadPackageDescriptions();
+        selected = packageDescriptions.at(key);
 
         // TODO: Cmake command
         // if(result, {
