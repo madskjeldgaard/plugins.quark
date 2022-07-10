@@ -40,7 +40,7 @@ Plugins{
         this.createSupportDirIfNecessary();
 
         packageFiles.do{ arg file;
-            packageDescriptions.put(file.fileNameWithoutExtension, file.fullPath.load())
+            packageDescriptions.put(file.fileNameWithoutExtension.asSymbol, file.fullPath.load())
         }
     }
 
@@ -81,21 +81,32 @@ Plugins{
 
     *installPlugin{arg key;
         var cmake;
-        var selected = packageDescriptions.at(key);
-        var result = this.cloneGitDir(selected[\url], this.pluginSupportDir);
-
-        // Clone SuperCollider if necessary
-        if(PathName(this.pluginSupportDir +/+ "supercollider").isFolder.not, {
-            this.cloneGitDir("https://github.com/supercollider/supercollider", this.pluginSupportDir)
-        });
+        var selected;
+        var path;
+        var result;
 
         this.loadPackageDescriptions();
-        selected = packageDescriptions.at(key);
+        selected = packageDescriptions.at(key.asSymbol);
 
-        // TODO: Cmake command
-        // if(result, {
+        if(selected.notNil, {
+
+            result = this.cloneGitDir(selected[\url], this.pluginSupportDir);
+
+            // Clone SuperCollider if necessary
+            if(PathName(this.pluginSupportDir +/+ "supercollider").isFolder.not, {
+                this.cloneGitDir("https://github.com/supercollider/supercollider", this.pluginSupportDir)
+            });
+
+            // TODO: Cmake command
+            // if(result, {
+            path = (this.pluginSupportDir +/+ key);
+
+            if(selected[\subfolder].notNil, {
+                path = path +/+ selected[\subfolder];
+            });
+
             cmake = CMake.new(
-                path: (this.pluginSupportDir +/+ key),
+                path: path,
                 pathToSuperColliderHeaders: scheaders,
                 installLocation: Platform.userExtensionDir
             );
@@ -104,7 +115,11 @@ Plugins{
                 prepareFlags:selected[\prepareFlags] ? [],
                 buildFlags:selected[\buildFlags] ? []
             );
-        // })
+            // })
+
+        }, {
+            "Could not find plugin description".error
+        })
     }
 
     *cloneGitDir{arg url, targetDir;
