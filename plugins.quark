@@ -1,3 +1,10 @@
 (
-name: "plugins.quark"
+    name: "plugins",
+    summary: "Install server plugins",
+    version: "0.1.0",
+    schelp: "",
+    dependencies: [],
+    url: "https://github.com/madskjeldgaard/plugins.quark",
+    license: "GPL",
+    copyright: "mads kjeldgaard"
 )
