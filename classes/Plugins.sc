@@ -9,7 +9,7 @@ Plugins{
     *initClass{
         StartUp.add({
             packageDescriptions = IdentityDictionary.new;
-            path = Quarks.at("plugins.quark").localPath;
+            path = Quarks.at("plugins").localPath;
 
             packageFiles = PathName(path +/+ "packages").files;
         });
