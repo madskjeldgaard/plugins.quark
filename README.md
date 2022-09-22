@@ -10,7 +10,7 @@ To use this package, you need to have `cmake` installed. The easiest way to do t
 ## Installation
 
 ```supercollider
-Quarks.install("https://github.com/madskjeldgaard/plugins.quark.git")
+Quarks.install("https://github.com/madskjeldgaard/plugins.quark")
 ```
 
 ## Usage
